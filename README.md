@@ -1,1 +1,0 @@
-HackLLMM at IIIT Delhi
