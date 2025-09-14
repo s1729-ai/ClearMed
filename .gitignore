@@ -1,0 +1,120 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyTorch/ML models
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+model.safetensors
+*.bin
+training_args.bin
+
+# Model outputs and checkpoints
+outputs/
+checkpoints/
+runs/
+logs/
+wandb/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Datasets (keep structure but ignore large files)
+*.csv
+*.jsonl
+*.json
+!config.json
+!generation_config.json
+
+# Large specific dataset files
+medquad.csv
+test.json
+train.json
+valid.json
+model.safetensors
+training_args.bin
+
+# Cache directories
+.cache/
+*.cache
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Hugging Face cache
+.cache/huggingface/
+transformers_cache/
+
+# Large files that should use Git LFS
+*.zip
+*.tar.gz
+*.pkl
+*.pickle
+*.mp4
+*.avi
+*.mov
+
+# Test outputs
+test_output/
+debug_output/

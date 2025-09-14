@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Frontend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.ready { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.loading { background: #fff3cd; color: #856404; }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        
+        .response {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        
+        .api-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Medical AI Frontend Test</h1>
+        
+        <div id="status" class="status loading">Checking API connection...</div>
+        
+        <div class="api-info">
+            <strong>API Endpoint:</strong> http://localhost:9999<br>
+            <strong>Status:</strong> <span id="api-status">Unknown</span>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="question" placeholder="Ask a medical question..." value="What are the symptoms of diabetes?">
+            <button onclick="askQuestion()">Ask AI</button>
+        </div>
+        
+        <div id="response" class="response" style="display: none;"></div>
+        
+        <div class="api-info">
+            <strong>Model Info:</strong><br>
+            <div id="model-info">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:9999';
+        
+        // Check API health on page load
+        window.onload = async function() {
+            await checkAPIHealth();
+            await loadModelInfo();
+        };
+        
+        async function checkAPIHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('status');
+                const apiStatusEl = document.getElementById('api-status');
+                
+                if (data.model_loaded) {
+                    statusEl.className = 'status ready';
+                    statusEl.textContent = `✅ API Ready: ${data.message}`;
+                    apiStatusEl.textContent = 'Connected';
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `❌ API Error: ${data.message}`;
+                    apiStatusEl.textContent = 'Error';
+                }
+            } catch (err) {
+                const statusEl = document.getElementById('status');
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ Cannot connect to API: ${err.message}`;
+                
+                const apiStatusEl = document.getElementById('api-status');
+                apiStatusEl.textContent = 'Disconnected';
+            }
+        }
+        
+        async function loadModelInfo() {
+            try {
+                const response = await fetch(`${API_URL}/model-info`);
+                const data = await response.json();
+                
+                const modelInfoEl = document.getElementById('model-info');
+                modelInfoEl.innerHTML = `
+                    <strong>Type:</strong> ${data.model_type}<br>
+                    <strong>Parameters:</strong> ${data.parameters}<br>
+                    <strong>Device:</strong> ${data.device}<br>
+                    <strong>Training Data:</strong> ${data.training_datasets}<br>
+                    <strong>Base Model:</strong> ${data.base_model}
+                `;
+            } catch (err) {
+                const modelInfoEl = document.getElementById('model-info');
+                modelInfoEl.textContent = `Error loading model info: ${err.message}`;
+            }
+        }
+        
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+            if (!question) return;
+            
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            
+            statusEl.className = 'status loading';
+            statusEl.textContent = '🤖 Generating AI response...';
+            responseEl.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        max_new_tokens: 200,
+                        temperature: 0.7
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.className = 'status ready';
+                    statusEl.textContent = '✅ Response generated successfully!';
+                    
+                    responseEl.style.display = 'block';
+                    responseEl.innerHTML = `
+                        <strong>Question:</strong> ${question}\n\n
+                        <strong>AI Response:</strong>\n${data.answer}\n\n
+                        <strong>Model:</strong> ${data.model_used}
+                    `;
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `❌ Error: ${data.message}`;
+                }
+                
+            } catch (err) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ API Error: ${err.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

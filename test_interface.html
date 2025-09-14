@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test Interface - Medical Q&A</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🏥 Medical Q&A Assistant</h1>
+        <p>Test Interface - Your Trained Model</p>
+      </header>
+
+      <div class="search-section">
+        <form id="search-form">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="query" 
+              placeholder="Ask a medical question..." 
+              required
+            >
+            <button type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="status" id="status">Ready to search...</div>
+
+      <div class="results-section">
+        <div id="results"></div>
+        <div id="final-answer"></div>
+        
+        <!-- AI Response Section -->
+        <div id="aiSection" class="ai-response-section" style="display: none;">
+          <div id="aiResponse"></div>
+          <div id="datasetResults"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

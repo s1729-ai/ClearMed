@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Medical Q&A Assistant - 4 Combined Datasets</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🏥 Medical Q&A Assistant</h1>
+        <p>Ask medical questions and get AI-powered answers from 4 combined medical datasets</p>
+      </header>
+
+      <main>
+        <section class="search-section">
+          <form id="search-form" aria-label="Medical question search">
+            <div class="input-group">
+              <label for="query" class="visually-hidden">Medical Question</label>
+              <input 
+                type="text" 
+                id="query" 
+                placeholder="Ask a medical question..." 
+                required
+                aria-required="true"
+                autocomplete="off"
+              >
+              <button type="submit" aria-label="Search">Search</button>
+            </div>
+          </form>
+        </section>
+
+        <div class="status" id="status" role="status">Ready to search...</div>
+        <div id="error-message" class="error-message" style="display: none;" role="alert"></div>
+        <div id="loading" class="loading" style="display: none;">
+          <span>Loading...</span>
+        </div>
+
+        <section class="results-section">
+          <div id="results"></div>
+          <div id="final-answer"></div>
+          
+          <!-- Summary Buttons -->
+          <div id="summary-buttons" class="summary-buttons" style="display: none;">
+            <h3>📋 Generate Summary</h3>
+            <div class="button-group">
+              <button id="doctor-summary-btn" class="summary-btn doctor-btn" tabindex="0">
+                👨‍⚕️ Doctor Summary
+              </button>
+              <button id="patient-summary-btn" class="summary-btn patient-btn" tabindex="0">
+                👤 Patient Summary
+              </button>
+            </div>
+            <div id="summary-result" class="summary-result"></div>
+          </div>
+          
+          <!-- AI Response Section -->
+          <div id="aiSection" class="ai-response-section" style="display: none;">
+            <div id="aiResponse"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Debug Datasets</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🔍 Debug Datasets</h1>
+        <p>Testing dataset loading and search functionality</p>
+      </header>
+
+      <div class="search-section">
+        <form id="search-form">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="query" 
+              placeholder="Ask a medical question..." 
+              required
+            >
+            <button type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="status" id="status">Ready to search...</div>
+
+      <div class="results-section">
+        <div id="results"></div>
+        <div id="final-answer"></div>
+        
+        <!-- AI Response Section -->
+        <div id="aiSection" class="ai-response-section" style="display: none;">
+          <div id="aiResponse"></div>
+          <div id="datasetResults"></div>
+        </div>
+      </div>
+
+      <!-- Debug Info -->
+      <div id="debugInfo" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <h3>Debug Information</h3>
+        <div id="debugContent"></div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+      // Add debug logging
+      const originalSetStatus = setStatus;
+      setStatus = function(msg) {
+        originalSetStatus(msg);
+        console.log('Status:', msg);
+        
+        // Update debug info
+        const debugContent = document.getElementById('debugContent');
+        debugContent.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${msg}</p>`;
+      };
+
+      // Override displayAIResponse to add debug info
+      const originalDisplayAIResponse = displayAIResponse;
+      displayAIResponse = function(data, searchResults) {
+        console.log('displayAIResponse called with:', { data, searchResults });
+        
+        // Update debug info
+        const debugContent = document.getElementById('debugContent');
+        debugContent.innerHTML += `<p>${new Date().toLocaleTimeString()}: AI Response received. Search results count: ${searchResults ? searchResults.length : 0}</p>`;
+        
+        originalDisplayAIResponse(data, searchResults);
+      };
+
+      // Add dataset loading debug
+      const originalLoadAllDatasets = loadAllDatasets;
+      loadAllDatasets = async function() {
+        console.log('Loading datasets...');
+        const debugContent = document.getElementById('debugContent');
+        debugContent.innerHTML += `<p>${new Date().toLocaleTimeString()}: Starting dataset load...</p>`;
+        
+        try {
+          await originalLoadAllDatasets();
+          debugContent.innerHTML += `<p>${new Date().toLocaleTimeString()}: Datasets loaded successfully. Total rows: ${state.rows.length}</p>`;
+        } catch (error) {
+          debugContent.innerHTML += `<p>${new Date().toLocaleTimeString()}: Error loading datasets: ${error.message}</p>`;
+        }
+      };
+    </script>
+  </body>
+</html>

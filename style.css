@@ -1,0 +1,531 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.search-section {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#query {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+#query:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+button {
+  padding: 15px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+.options {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.status {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.results-section {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.result {
+  padding: 20px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.result:last-child {
+  border-bottom: none;
+}
+
+.result h3 {
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.result p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.result .score {
+  background: #e8f4fd;
+  color: #0066cc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+#final-answer {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 0;
+}
+
+#final-answer h3 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+#final-answer p {
+  color: rgba(255,255,255,0.9);
+  line-height: 1.7;
+}
+
+.dataset-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 8px;
+  color: white;
+}
+
+.dataset-badge.csv {
+  background-color: #007bff;
+}
+
+.dataset-badge.test {
+  background-color: #28a745;
+}
+
+.dataset-badge.train {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.dataset-badge.valid {
+  background-color: #dc3545;
+}
+
+/* Summary Section */
+.summary-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.summary-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+}
+
+/* Summary Buttons */
+.summary-buttons {
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.summary-buttons h3 {
+  margin: 0 0 15px 0;
+  color: #212529;
+  font-size: 18px;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.summary-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.doctor-btn {
+  background: #007bff;
+  color: white;
+}
+
+.doctor-btn:hover {
+  background: #0056b3;
+}
+
+.patient-btn {
+  background: #28a745;
+  color: white;
+}
+
+.patient-btn:hover {
+  background: #1e7e34;
+}
+
+.summary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.summary-result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  display: none;
+}
+
+.summary-result.doctor {
+  background: #e3f2fd;
+  border-left: 4px solid #007bff;
+}
+
+.summary-result.patient {
+  background: #e8f5e8;
+  border-left: 4px solid #28a745;
+}
+
+.summary-result h4 {
+  margin: 0 0 10px 0;
+  color: #212529;
+  font-size: 16px;
+}
+
+.summary-result p {
+  margin: 0;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.summary-output {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.summary-output h5 {
+  margin: 0 0 15px 0;
+  color: #212529;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary-content {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.summary-disclaimer {
+  padding: 10px;
+  background: #fff3cd;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+}
+
+.summary-disclaimer small {
+  color: #856404;
+  font-size: 12px;
+}
+
+.summary-error {
+  padding: 15px;
+  background: #f8d7da;
+  border-radius: 6px;
+  border-left: 4px solid #dc3545;
+  color: #721c24;
+  font-size: 14px;
+}
+
+/* Doctor Summary Specific Styling */
+.doctor-summary {
+  border-left: 4px solid #ff6b6b;
+}
+
+.doctor-summary h5 {
+  color: #d63031;
+}
+
+/* Patient Summary Specific Styling */
+.patient-summary {
+  border-left: 4px solid #74b9ff;
+}
+
+.patient-summary h5 {
+  color: #0984e3;
+}
+
+/* Dataset Results Section */
+.dataset-section {
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.dataset-toggle {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+}
+
+.dataset-toggle:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.dataset-content {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.dataset-content h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 16px;
+}
+
+.result-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+}
+
+.result-item h5 {
+  margin: 0 0 10px 0;
+  color: #212529;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-item p {
+  margin: 0 0 10px 0;
+  color: #495057;
+  line-height: 1.5;
+}
+
+.result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.result-meta span {
+  background: #e9ecef;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* AI Response Section */
+.ai-response-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.ai-response h3 {
+  margin: 0 0 15px 0;
+  color: #212529;
+  font-size: 18px;
+}
+
+.ai-response p {
+  margin: 0 0 15px 0;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.model-info {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 10px;
+}
+
+/* Model Status Indicator */
+.model-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 12px;
+}
+
+.model-status.ready {
+  background: #4caf50;
+  color: white;
+}
+
+.model-status.error {
+  background: #f44336;
+  color: white;
+}
+
+.model-status.loading {
+  background: #ff9800;
+  color: white;
+}
+
+/* Enhanced Search Results with AI Integration */
+.results-section {
+  margin-top: 24px;
+}
+
+.results-section h3 {
+  color: #333;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading Animation for AI */
+.ai-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design for AI Section */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .options {
+    flex-direction: column;
+  }
+
+  .ai-response-section {
+    padding: 16px;
+    margin: 16px 0;
+  }
+  
+  .ai-response-section h3 {
+    font-size: 1.2rem;
+  }
+  
+  .ai-response {
+    padding: 12px;
+  }
+}

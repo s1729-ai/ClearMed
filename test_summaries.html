@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Summary Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.ready { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.loading { background: #fff3cd; color: #856404; }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        
+        .response {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        
+        .summary-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .summary-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .summary-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .doctor-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        
+        .doctor-btn:hover {
+            background: linear-gradient(135deg, #ee5a24, #d63031);
+            transform: translateY(-2px);
+        }
+        
+        .patient-btn {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+        
+        .patient-btn:hover {
+            background: linear-gradient(135deg, #0984e3, #0652dd);
+            transform: translateY(-2px);
+        }
+        
+        .summary-output {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .doctor-summary {
+            border-left-color: #ff6b6b;
+        }
+        
+        .patient-summary {
+            border-left-color: #74b9ff;
+        }
+        
+        .summary-output h5 {
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .summary-content {
+            color: #000;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+        }
+        
+        .summary-disclaimer {
+            text-align: center;
+            opacity: 0.8;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .summary-disclaimer small {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        
+        .summary-error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            color: #c0392b;
+            text-align: center;
+        }
+        
+        .doctor-summary h5 {
+            color: #d63031;
+        }
+        
+        .patient-summary h5 {
+            color: #0984e3;
+        }
+        
+        .api-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Medical AI Summary Test</h1>
+        
+        <div id="status" class="status loading">Checking API connection...</div>
+        
+        <div class="api-info">
+            <strong>API Endpoint:</strong> http://localhost:9999<br>
+            <strong>Status:</strong> <span id="api-status">Unknown</span>
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="question" placeholder="Ask a medical question..." value="What are the symptoms and treatment for diabetes?">
+            <button onclick="askQuestion()">Ask AI</button>
+        </div>
+        
+        <div id="response" class="response" style="display: none;"></div>
+        
+        <!-- Summary Section -->
+        <div id="summary-section" class="summary-section" style="display: none;">
+            <h3>📋 Generate Summary</h3>
+            <div class="summary-buttons">
+                <button id="doctor-summary-btn" class="summary-btn doctor-btn" onclick="generateSummary('doctor')">
+                    👨‍⚕️ Doctor Summary
+                </button>
+                <button id="patient-summary-btn" class="summary-btn patient-btn" onclick="generateSummary('patient')">
+                    👤 Patient Summary
+                </button>
+            </div>
+            <div id="summary-result" class="summary-result"></div>
+        </div>
+        
+        <div class="api-info">
+            <strong>Model Info:</strong><br>
+            <div id="model-info">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:9999';
+        let aiResponse = null;
+        
+        // Check API health on page load
+        window.onload = async function() {
+            await checkAPIHealth();
+            await loadModelInfo();
+        };
+        
+        async function checkAPIHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('status');
+                const apiStatusEl = document.getElementById('api-status');
+                
+                if (data.model_loaded) {
+                    statusEl.className = 'status ready';
+                    statusEl.textContent = `✅ API Ready: ${data.message}`;
+                    apiStatusEl.textContent = 'Connected';
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `❌ API Error: ${data.message}`;
+                    apiStatusEl.textContent = 'Error';
+                }
+            } catch (err) {
+                const statusEl = document.getElementById('status');
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ Cannot connect to API: ${err.message}`;
+                
+                const apiStatusEl = document.getElementById('api-status');
+                apiStatusEl.textContent = 'Disconnected';
+            }
+        }
+        
+        async function loadModelInfo() {
+            try {
+                const response = await fetch(`${API_URL}/model-info`);
+                const data = await response.json();
+                
+                const modelInfoEl = document.getElementById('model-info');
+                modelInfoEl.innerHTML = `
+                    <strong>Type:</strong> ${data.model_type}<br>
+                    <strong>Parameters:</strong> ${data.parameters}<br>
+                    <strong>Device:</strong> ${data.device}<br>
+                    <strong>Training Data:</strong> ${data.training_datasets}<br>
+                    <strong>Base Model:</strong> ${data.base_model}
+                `;
+            } catch (err) {
+                const modelInfoEl = document.getElementById('model-info');
+                modelInfoEl.textContent = `Error loading model info: ${err.message}`;
+            }
+        }
+        
+        async function askQuestion() {
+            const question = document.getElementById('question').value.trim();
+            if (!question) return;
+            
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            const summarySectionEl = document.getElementById('summary-section');
+            
+            statusEl.className = 'status loading';
+            statusEl.textContent = '🤖 Generating AI response...';
+            responseEl.style.display = 'none';
+            summarySectionEl.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        max_new_tokens: 200,
+                        temperature: 0.7
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.className = 'status ready';
+                    statusEl.textContent = '✅ Response generated successfully!';
+                    
+                    aiResponse = data.answer;
+                    responseEl.style.display = 'block';
+                    responseEl.innerHTML = `
+                        <strong>Question:</strong> ${question}\n\n
+                        <strong>AI Response:</strong>\n${data.answer}\n\n
+                        <strong>Model:</strong> ${data.model_used}
+                    `;
+                    
+                    // Show summary section
+                    summarySectionEl.style.display = 'block';
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `❌ Error: ${data.message}`;
+                }
+                
+            } catch (err) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ API Error: ${err.message}`;
+            }
+        }
+        
+        async function generateSummary(summaryType) {
+            if (!aiResponse) {
+                alert('Please ask a question first to get an AI response before generating summaries.');
+                return;
+            }
+            
+            const summaryResultEl = document.getElementById('summary-result');
+            const buttonEl = document.getElementById(`${summaryType}-summary-btn`);
+            
+            try {
+                // Update button state
+                buttonEl.disabled = true;
+                buttonEl.innerHTML = summaryType === 'doctor' ? '👨‍⚕️ Generating...' : '👤 Generating...';
+                
+                // Generate summary using the API
+                const response = await fetch(`${API_URL}/generate-summary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: aiResponse,
+                        summary_type: summaryType,
+                        max_new_tokens: 300,
+                        temperature: 0.5
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const summaryTypeLabel = summaryType === 'doctor' ? 'Doctor Summary' : 'Patient Summary';
+                    const icon = summaryType === 'doctor' ? '👨‍⚕️' : '👤';
+                    
+                    summaryResultEl.innerHTML = `
+                        <div class="summary-output ${summaryType}-summary">
+                            <h5>${icon} ${summaryTypeLabel}</h5>
+                            <div class="summary-content">${data.summary}</div>
+                            <div class="summary-disclaimer">
+                                <small>⚠️ This is an AI-generated summary. Always consult healthcare professionals for medical decisions.</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    summaryResultEl.style.display = 'block';
+                } else {
+                    summaryResultEl.innerHTML = `
+                        <div class="summary-error">
+                            ❌ Error generating ${summaryType} summary: ${data.message}
+                        </div>
+                    `;
+                    summaryResultEl.style.display = 'block';
+                }
+                
+            } catch (err) {
+                summaryResultEl.innerHTML = `
+                    <div class="summary-error">
+                        ❌ API Error: ${err.message}
+                    </div>
+                `;
+                summaryResultEl.style.display = 'block';
+            } finally {
+                // Reset button state
+                buttonEl.disabled = false;
+                buttonEl.innerHTML = summaryType === 'doctor' ? '👨‍⚕️ Doctor Summary' : '👤 Patient Summary';
+            }
+        }
+    </script>
+</body>
+</html>

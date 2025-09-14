@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test Datasets Loading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  </head>
+  <body>
+    <h1>Test Datasets Loading</h1>
+    <div id="status">Loading...</div>
+    <div id="results"></div>
+
+    <script>
+      // Copy the state and functions from app.js
+      const state = {
+        rows: [],
+        termToDocTf: new Map(),
+        docLengths: [],
+        avgDocLen: 0,
+        loaded: false,
+        datasetStats: {
+          csv: 0,
+          test: 0,
+          train: 0,
+          valid: 0
+        }
+      };
+
+      function setStatus(msg) {
+        document.getElementById('status').textContent = msg;
+        console.log(msg);
+      }
+
+      async function loadAllDatasets() {
+        try {
+          setStatus('Loading all 4 datasets...');
+          
+          // Load CSV dataset
+          await loadCsv();
+          
+          // Load JSON datasets
+          await loadJsonDataset('test.json', 'test');
+          await loadJsonDataset('train.json', 'train');
+          await loadJsonDataset('valid.json', 'valid');
+          
+          state.loaded = true;
+          
+          const totalRows = state.rows.length;
+          setStatus(`Loaded ${totalRows.toLocaleString()} total entries from all 4 datasets.`);
+          
+          document.getElementById('results').innerHTML = `
+            <h2>Dataset Stats:</h2>
+            <ul>
+              <li>CSV: ${state.datasetStats.csv.toLocaleString()}</li>
+              <li>Test: ${state.datasetStats.test.toLocaleString()}</li>
+              <li>Train: ${state.datasetStats.train.toLocaleString()}</li>
+              <li>Valid: ${state.datasetStats.valid.toLocaleString()}</li>
+              <li>Total: ${totalRows.toLocaleString()}</li>
+            </ul>
+          `;
+          
+        } catch (err) {
+          console.error(err);
+          setStatus('Error loading datasets: ' + err.message);
+        }
+      }
+
+      async function loadCsv() {
+        try {
+          setStatus('Loading CSV dataset...');
+          const response = await fetch('./medquad.csv');
+          if (!response.ok) throw new Error(`Failed to fetch medquad.csv: ${response.status}`);
+          
+          const text = await response.text();
+          const results = Papa.parse(text, { header: true });
+          
+          for (const row of results.data) {
+            if (row.question && row.answer) {
+              state.rows.push({
+                question: row.question.trim(),
+                answer: row.answer.trim(),
+                source: row.source || 'CSV',
+                focus_area: row.focus_area || 'General',
+                dataset: 'csv'
+              });
+            }
+          }
+          
+          state.datasetStats.csv = state.rows.length;
+          setStatus(`Loaded ${state.rows.length.toLocaleString()} CSV entries.`);
+        } catch (err) {
+          console.error('Error loading CSV:', err);
+          setStatus('Error loading CSV dataset: ' + err.message);
+        }
+      }
+
+      async function loadJsonDataset(filename, datasetType) {
+        try {
+          setStatus(`Loading ${filename}...`);
+          const response = await fetch(`./${filename}`);
+          if (!response.ok) {
+            console.warn(`Failed to fetch ${filename}: ${response.status}`);
+            return;
+          }
+          
+          const data = await response.json();
+          console.log(`Loaded ${data.length} entries from ${filename}`);
+          
+          let count = 0;
+          for (const entry of data) {
+            const question = entry.question?.trim();
+            const context = entry.context?.trim();
+            
+            if (!question) continue;
+            
+            let answer = '';
+            if (entry.labelled_summaries) {
+              const summaries = entry.labelled_summaries;
+              if (summaries.INFORMATION_SUMMARY) {
+                answer = summaries.INFORMATION_SUMMARY;
+              } else if (summaries.SUGGESTION_SUMMARY) {
+                answer = summaries.SUGGESTION_SUMMARY;
+              } else if (summaries.EXPERIENCE_SUMMARY) {
+                answer = summaries.EXPERIENCE_SUMMARY;
+              } else if (summaries.CAUSE_SUMMARY) {
+                answer = summaries.CAUSE_SUMMARY;
+              }
+            }
+            
+            if (!answer && entry.answers && entry.answers.length > 0) {
+              answer = entry.answers[0];
+            }
+            
+            if (!answer) continue;
+            
+            state.rows.push({
+              question: question,
+              answer: answer,
+              source: context || 'JSON',
+              focus_area: context || 'General',
+              dataset: datasetType
+            });
+            count++;
+          }
+          
+          state.datasetStats[datasetType] = count;
+          setStatus(`Loaded ${count.toLocaleString()} entries from ${filename}`);
+        } catch (err) {
+          console.error(`Error loading ${filename}:`, err);
+          setStatus(`Error loading ${filename}: ` + err.message);
+        }
+      }
+
+      // Start loading
+      loadAllDatasets();
+    </script>
+  </body>
+</html>
